@@ -1,0 +1,13 @@
+<p id="notice"><%= notice %></p>
+<h1>Log In</h1>
+<form action='/sessions' method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+    <label for="email">Email</label><br>
+    <input type="email" id="email" name="user[email]" value="<%= @user.email %>" /><br>
+
+    <label for="password">Password</label><br>
+    <input type="password" id="password" name="user[password]" /><br>
+    <br>
+    <input type="submit" value="LogIn">
+</form>

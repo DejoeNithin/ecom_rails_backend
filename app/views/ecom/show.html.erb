@@ -1,0 +1,15 @@
+<h1 style="text-align:center;color:blue;"><%= @prod.product_name %></h1>
+<div style="text-align:center;">
+<img src="/assets/<%= @skus.id %>.jpg" height="300" width="300">
+<h4>Description : <br><%= @prod.description %></h4>
+<h4>Brand : <%= @prod.brand_name %></h4>
+<h4 style="color:#90EE90;">Stock : <%= @skus.stock %></h4>
+<h4>Product Attributes : </h4>
+<table>
+    <tr>
+    <th>AttributeName</th>
+    <th>AttributeValue</th>
+    </tr>
+    
+</table>
+<h4 style="color:green;">Price : <%= @skus.price %>/-</h4>

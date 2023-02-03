@@ -1,0 +1,2 @@
+class Skunit < ApplicationRecord
+end

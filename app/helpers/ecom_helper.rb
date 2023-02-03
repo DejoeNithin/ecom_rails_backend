@@ -1,0 +1,2 @@
+module EcomHelper
+end

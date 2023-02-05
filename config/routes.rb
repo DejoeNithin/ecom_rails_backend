@@ -20,6 +20,8 @@ Rails.application.routes.draw do
   get 'ecom/product_filter', to: 'ecom#product_filter'
   get 'ecom/variant_filter', to: 'ecom#variant_filter'
   get 'ecom/multi_filter', to: 'ecom#multi_filter'
+  get 'ecom/price_filter', to: 'ecom#price_filter'
+  get 'ecom/price_sort_by', to: 'ecom#price_sort_by'
   resources :user
   resources :session
   resources :ecom 

@@ -4,18 +4,18 @@ class EcomController < ApplicationController
   helper_method :last_page? 
 
   def index
-    #@skus = Skunit.all
+    #to execute raw sql statements
     #@skus = execute_statement("select skunits.id as id, 
      # skunits.price as price, products.product_name as name from 
       #skunits inner join products on skunits.product_id 
       #= products.id")
-    #@skus = Skunit.all 
-    #@prod = Product.all
 
+    #set default page number as 0 for index, else get from url
     @page = params.fetch(:page, 0).to_i
     @skus = Skunit.offset(@page * PROD_PER_PAGE).limit(PROD_PER_PAGE)
     @skusize = Skunit.all
     
+    #return json
     @return = { "data" => []}
     @skus.each do |skus|
       @prod = prod(skus)
@@ -25,6 +25,7 @@ class EcomController < ApplicationController
            "brand_name" => @prod.brand_name })
     end 
     @return["products_per_page"] = PROD_PER_PAGE
+    #total page number
     skusize = Skunit.all.size().to_i / PROD_PER_PAGE
     if Skunit.all.size().to_i % PROD_PER_PAGE == 0
       skusize -= 1
@@ -33,13 +34,16 @@ class EcomController < ApplicationController
     render :json => @return
   end
 
+
   def page
     #json_params = JSON.parse(request.raw_post)
+    #another method to parse json request
     prms = JSON.parse(request.body.read)
     skusize = Skunit.all.size().to_i / PROD_PER_PAGE
     if Skunit.all.size().to_i % PROD_PER_PAGE == 0
       skusize -= 1
     end 
+
     if prms["page"] < 0 || prms["page"] > skusize
       render :json => {"message" => "PAGE LIMIT EXCEEDED!!!",
        "page range" => "0 to #{skusize}",
@@ -47,16 +51,13 @@ class EcomController < ApplicationController
     else 
       redirect_to ecom_path(page: prms["page"])
     end 
-    
-    #render :json => {"hi" => prms["name"] }
-    #redirect_to ecom_path(page: :page)
   end 
 
   def category_filter
     @category = Category.find_by(:name => params[:category_name])
     @sub_category = SubCategory.where(:category_id => @category.id)
     @return = { "SubCategory" => [], "Products" => []}
-    puts "sc : #{@sub_category}"
+    
     @sub_category.each do |subc|
       @return["SubCategory"].push({"sub_category_id" => subc.id, "name" => subc.sub_category_name})
       @products = Product.where(:sub_category_id => subc.id)
@@ -67,23 +68,25 @@ class EcomController < ApplicationController
         end
       end
     end 
+
     render :json => @return
   end 
+
 
   def product_filter
     @products = Product.where('product_name LIKE ?', '%'+params[:search]+'%').all
     render :json => @products 
   end 
 
+
   def variant_filter
-    #puts "#{params}"
-    #@return = params
-    #render :json => @return
     @products = Product.find_by(:id => params[:product_id])
     @skunit = Skunit.where(:product_id => @products.id).all
     @skus = Set[]
+
     puts "products : #{@products.id}"
     puts "skunit : #{@skunit.ids}"
+
     params[:search].each do |search|
       @skunit.each do |skunit|
         @attr = Attribute.where('sku_id == ? AND attribute_name LIKE ? AND attribute_value LIKE ?', skunit.id, search["attribute_name"], search["attribute_value"]).all
@@ -94,6 +97,7 @@ class EcomController < ApplicationController
         end 
       end 
     end 
+
     @return = Skunit.where(id: @skus)
     @attr = Attribute.where(sku_id: @return)
     render :json => {:skus => @return, :attributes => @attr}
@@ -101,6 +105,7 @@ class EcomController < ApplicationController
 
 
   def multi_filter
+    #for category
     p_id = Set[]
     if params["category"] == ""
     else 
@@ -109,8 +114,7 @@ class EcomController < ApplicationController
       p_id = Product.where(:sub_category_id => s_id).pluck(:id).to_set
     end 
 
-    puts "1 p_id : #{p_id}"
-
+    #for sub_category
     sp_id = Set[]
     if params["sub_category"] == ""
     else 
@@ -118,12 +122,14 @@ class EcomController < ApplicationController
       sp_id = Product.where(:sub_category_id => s_id).pluck(:id).to_set
     end 
 
+    #for products
     pp_id = Set[]
     if params["product"] == ""
     else 
       pp_id = Product.where('product_name LIKE ?', '%'+params["product"]+'%').pluck(:id).to_set
     end
 
+    #to get unique values
     result = Product.pluck(:id).to_set 
     if params["category"] != ""
       result &= p_id 
@@ -135,10 +141,31 @@ class EcomController < ApplicationController
       result &= pp_id 
     end 
 
+    #result
     @products = Product.where(:id => result)
 
     render :json => @products 
 
+  end 
+
+
+  def price_filter
+    if params["type"] == "low"
+      @sku = Skunit.where('price <= ?', params["price"])
+    else 
+      @sku = Skunit.where('price >= ?', params["price"])
+    end 
+    render :json => @sku
+  end
+
+  def price_sort_by
+    @skus = Skunit.all
+    if params["order"] == "ascending"
+      @skus = @skus.sort_by{|e| e[:price]}
+    else
+      @skus = @skus.sort_by{|e| -e[:price]}
+    end 
+    render :json => @skus 
   end 
 
 

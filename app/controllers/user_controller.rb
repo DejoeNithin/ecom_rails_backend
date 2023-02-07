@@ -20,5 +20,5 @@ class UserController < ApplicationController
   private
   def valid_params
     params.require(:user).permit(:name, :email, :password)
-  end
+  end 
 end

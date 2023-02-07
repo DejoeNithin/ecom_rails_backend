@@ -82,7 +82,7 @@ class EcomController < ApplicationController
   def variant_filter
     @products = Product.find_by(:id => params[:product_id])
     @skunit = Skunit.where(:product_id => @products.id).all
-    @skus = Set[]
+    @skus = @skunit.pluck(:id).to_set 
 
     puts "products : #{@products.id}"
     puts "skunit : #{@skunit.ids}"
@@ -91,10 +91,12 @@ class EcomController < ApplicationController
       @skunit.each do |skunit|
         @attr = Attribute.where('sku_id == ? AND attribute_name LIKE ? AND attribute_value LIKE ?', skunit.id, search["attribute_name"], search["attribute_value"]).all
         puts "attr : #{@attr}"
+        @sku = Set[]
         @attr.each do |attr|
-          @skus |= Set[attr.sku_id]
+          @sku |= Set[attr.sku_id]
           puts "#{attr}"
         end 
+        @skus &= @sku 
       end 
     end 
 

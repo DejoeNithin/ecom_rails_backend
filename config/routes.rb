@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 #   get 'show/:id', to: 'ecom#show', as: :show
   get 'ecom/', to: 'ecom#index'
   get 'ecom/page', to: 'ecom#page'
-  get 'ecom/show', to: 'ecom#show'
+  post 'ecom/show', to: 'ecom#show'
   get 'session/logout', to: 'session#destroy'
   get 'ecom/category_filter', to: 'ecom#category_filter'
   get 'ecom/product_filter', to: 'ecom#product_filter'
@@ -22,8 +22,10 @@ Rails.application.routes.draw do
   get 'ecom/multi_filter', to: 'ecom#multi_filter'
   get 'ecom/price_filter', to: 'ecom#price_filter'
   get 'ecom/price_sort_by', to: 'ecom#price_sort_by'
+  #post 'user', to: 'user#create'
   resources :user
   resources :session
   resources :ecom 
+  post 'user', to: 'user#create'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

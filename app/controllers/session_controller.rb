@@ -8,6 +8,7 @@ class SessionController < ApplicationController
 
   def create
     @user = User.find_by(email: params[:email])
+    p "user : #{@user}"
     
     if @user && @user.password == user_params[:password]
       #@tok.token = Base64.encode64(Time.now.to_s + @user.email)

@@ -33,14 +33,14 @@ class ApplicationController < ActionController::Base
     #token validation
     def validate_auth_token
         if request.headers["Authorization"].blank?
-            render json: {'status_code': 401, message: '1 - Missing authentication token'}, status: 403 and return
+            render json: {'status_code': 401, message: '1 - Missing authentication token'}, status: 401 and return
         end 
         
         #puts "author : #{request.headers["Authorization"].size()}".to_s
         @token = Token.find_by(:user_id => get_id_from_token.to_i)
         #puts "#{@token}".to_s 
         if request.headers["Authorization"].to_s != @token.token.to_s
-            render json: {'status_code': 401, message: '2 - wrong authentication token'}, status: 403 and return
+            render json: {'status_code': 401, message: '2 - wrong authentication token'}, status: 401 and return
         end
 
         @t1=Time.parse(DateTime.now.to_s)
